@@ -34,26 +34,44 @@ extern "C" {
 typedef struct shift_register *shift_register_handle_t;
 
 typedef enum {
-	SHIFT_REGISTER_COMM_MODE_GPIO = 0,
-	SHIFT_REGISTER_COMM_MODE_SPI,
+	SHIFT_REGISTER_COMM_MODE_GPIO = 0,			/*!< Communicate through GPIO */
+	SHIFT_REGISTER_COMM_MODE_SPI,				/*!< Communicate through SPI */
 	SHIFT_REGISTER_COMM_MODE_MAX,
 } shift_register_comm_mode_t;
 
 typedef struct {
-	int 					gpio_port_data;
-	int 					gpio_num_data;
-	int 					gpio_port_clk;
-	int 					gpio_num_clk;
-	spi_num_t				spi_num;
-	spi_pins_pack_t			spi_pins_pack;
+	int 					gpio_port_data;		/*!< Pin data GPIO Port */
+	int 					gpio_num_data;		/*!< Pin data GPIO num */
+	int 					gpio_port_clk;		/*!< Pin clock GPIO Port */
+	int 					gpio_num_clk;		/*!< Pin clock GPIO num */
+	spi_num_t				spi_num;			/*!< SPI num */
+	spi_pins_pack_t			spi_pins_pack;		/*!< SPI pins pack */
 } shift_register_hw_info_t;
 
 typedef struct {
-	shift_register_hw_info_t 	hw_info;
-	shift_register_comm_mode_t 	comm_mode;
+	shift_register_hw_info_t 	hw_info;		/*!< Hardware information */
+	shift_register_comm_mode_t 	comm_mode;		/*!< Communicate mode */
 } shift_register_cfg_t;
 
+
+/* 
+ * @brief	Initialize shift register driver.
+ * @param 	config Pointer to config structure.
+ * @return
+ *      - Shift register handle structure: Success.
+ *      - 0: Fail.
+ */
 shift_register_handle_t shift_register_init(shift_register_cfg_t *config);
+
+/* 
+ * @brief	Send data.
+ * @param 	handle Handle structure.
+ * @param 	data Pointer to data send.
+ * @param 	length Data length.
+ * @return
+ *      - STM_OK:   Success.
+ *      - Others: 	Fail.
+ */
 stm_err_t shift_register_write_bytes(shift_register_handle_t handle, uint8_t *data, uint16_t length);
 
 #ifdef __cplusplus

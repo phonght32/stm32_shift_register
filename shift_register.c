@@ -24,10 +24,10 @@ typedef stm_err_t (*init_func)(shift_register_hw_info_t hw_info);
 typedef stm_err_t (*write_func)(shift_register_hw_info_t hw_info, uint8_t data);
 
 typedef struct shift_register {
-	shift_register_hw_info_t 	hw_info;
-	shift_register_comm_mode_t 	comm_mode;
-	write_func 					_write;
-	SemaphoreHandle_t 			lock;
+	shift_register_hw_info_t 	hw_info;		/*!< Hardware information */
+	shift_register_comm_mode_t 	comm_mode;		/*!< Communicate mode */
+	write_func 					_write;			/*!< Write function */
+	SemaphoreHandle_t 			lock;			/*!< Semaphore */
 } shift_register_t;
 
 stm_err_t _init_gpio(shift_register_hw_info_t hw_info)

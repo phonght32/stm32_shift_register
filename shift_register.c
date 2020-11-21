@@ -54,8 +54,9 @@ stm_err_t _init_spi(shift_register_hw_info_t hw_info)
 	return STM_OK;
 }
 
-stm_err_t _write_data_gpio(shift_register_hw_info_t hw_info, uint8_t data)
+stm_err_t _write_gpio(shift_register_hw_info_t hw_info, uint8_t data)
 {
+	STM_LOGD(TAG, "data: %x", data);
 	SHIFT_REGISTER_CHECK(!gpio_set_level(hw_info.gpio_port_clk, hw_info.gpio_num_clk, true), SHIFT_REGISTER_WRITE_ERR_STR, return STM_FAIL);
 
 	for (uint8_t i = 0; i < 8; i++) {
@@ -67,7 +68,7 @@ stm_err_t _write_data_gpio(shift_register_hw_info_t hw_info, uint8_t data)
 	return STM_OK;
 }
 
-stm_err_t _write_data_spi(shift_register_hw_info_t hw_info, uint8_t data)
+stm_err_t _write_spi(shift_register_hw_info_t hw_info, uint8_t data)
 {
 	return STM_OK;
 }
@@ -84,9 +85,9 @@ init_func _get_init_func(shift_register_comm_mode_t comm_mode)
 write_func _get_write_func(shift_register_comm_mode_t comm_mode)
 {
 	if (comm_mode == SHIFT_REGISTER_COMM_MODE_GPIO) {
-		return _write_data_gpio;
+		return _write_gpio;
 	} else {
-		return _write_data_spi;
+		return _write_spi;
 	}
 }
 
@@ -128,11 +129,13 @@ stm_err_t shift_register_write_bytes(shift_register_handle_t handle, uint8_t *da
 	mutex_lock(handle->lock);
 
 	int ret;
-	ret = handle->_write(handle->hw_info, *data);
-	if (ret) {
-		STM_LOGE(TAG, SHIFT_REGISTER_WRITE_ERR_STR);
-		mutex_unlock(handle->lock);
-		return STM_FAIL;
+	for (uint16_t i = 0; i < length; i++) {
+		ret = handle->_write(handle->hw_info, *data);
+		if (ret) {
+			STM_LOGE(TAG, SHIFT_REGISTER_WRITE_ERR_STR);
+			mutex_unlock(handle->lock);
+			return STM_FAIL;
+		}
 	}
 
 	mutex_unlock(handle->lock);

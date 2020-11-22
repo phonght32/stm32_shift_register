@@ -33,24 +33,13 @@ extern "C" {
 
 typedef struct shift_register *shift_register_handle_t;
 
-typedef enum {
-	SHIFT_REGISTER_COMM_MODE_GPIO = 0,			/*!< Communicate through GPIO */
-	SHIFT_REGISTER_COMM_MODE_SPI,				/*!< Communicate through SPI */
-	SHIFT_REGISTER_COMM_MODE_MAX,
-} shift_register_comm_mode_t;
-
 typedef struct {
-	int 					gpio_port_data;		/*!< Pin data GPIO Port */
-	int 					gpio_num_data;		/*!< Pin data GPIO num */
-	int 					gpio_port_clk;		/*!< Pin clock GPIO Port */
-	int 					gpio_num_clk;		/*!< Pin clock GPIO num */
 	spi_num_t				spi_num;			/*!< SPI num */
 	spi_pins_pack_t			spi_pins_pack;		/*!< SPI pins pack */
 } shift_register_hw_info_t;
 
 typedef struct {
 	shift_register_hw_info_t 	hw_info;		/*!< Hardware information */
-	shift_register_comm_mode_t 	comm_mode;		/*!< Communicate mode */
 } shift_register_cfg_t;
 
 

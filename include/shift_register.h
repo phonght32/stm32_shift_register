@@ -28,7 +28,6 @@ extern "C" {
 #endif
 
 #include "stm_err.h"
-#include "driver/gpio.h"
 #include "driver/spi.h"
 
 typedef struct shift_register *shift_register_handle_t;
@@ -36,12 +35,9 @@ typedef struct shift_register *shift_register_handle_t;
 typedef struct {
 	spi_num_t				spi_num;			/*!< SPI num */
 	spi_pins_pack_t			spi_pins_pack;		/*!< SPI pins pack */
-} shift_register_hw_info_t;
-
-typedef struct {
-	shift_register_hw_info_t 	hw_info;		/*!< Hardware information */
+	spi_cap_edge_t			cap_edge;			/*!< Edge type to capture data */
+	spi_trans_firstbit_t	firstbit;			/*!< MSB/LSB firstbit */
 } shift_register_cfg_t;
-
 
 /* 
  * @brief	Initialize shift register driver.

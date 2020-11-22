@@ -21,8 +21,11 @@ static const char* TAG = "SHIFT_REGISTER";
         }
 
 typedef struct shift_register {
-	shift_register_hw_info_t 	hw_info;		/*!< Hardware information */
-	SemaphoreHandle_t 			lock;			/*!< Semaphore */
+	spi_num_t				spi_num;			/*!< SPI num */
+	spi_pins_pack_t			spi_pins_pack;		/*!< SPI pins pack */
+	spi_cap_edge_t			cap_edge;			/*!< Edge type to capture data */
+	spi_trans_firstbit_t	firstbit;			/*!< MSB/LSB firstbit */
+	SemaphoreHandle_t 		lock;				/*!< Semaphore */
 } shift_register_t;
 
 void _shift_register_cleanup(shift_register_handle_t handle)
@@ -33,13 +36,23 @@ void _shift_register_cleanup(shift_register_handle_t handle)
 shift_register_handle_t shift_register_init(shift_register_cfg_t *config)
 {
 	SHIFT_REGISTER_CHECK(config, SHIFT_REGISTER_INIT_ERR_STR, return NULL);
-	SHIFT_REGISTER_CHECK(config->hw_info.spi_num < SPI_NUM_MAX, SHIFT_REGISTER_INIT_ERR_STR, return NULL);
-	SHIFT_REGISTER_CHECK(config->hw_info.spi_pins_pack < SPI_PINS_PACK_MAX, SHIFT_REGISTER_INIT_ERR_STR, return NULL);
 
 	shift_register_handle_t handle = calloc(1, sizeof(shift_register_t));
 	SHIFT_REGISTER_CHECK(handle, SHIFT_REGISTER_INIT_ERR_STR, return NULL);
 
-	handle->hw_info = config->hw_info;
+	spi_cfg_t spi_cfg = {
+		.spi_num = config->spi_num,
+		.spi_pins_pack = config->spi_pins_pack,
+		.mode = SPI_MODE_MASTER_HALF_DUPLEX,
+		.cap_edge = config->cap_edge,
+		.firstbit = config->firstbit
+	};
+	SHIFT_REGISTER_CHECK(!spi_config(&spi_cfg), SHIFT_REGISTER_INIT_ERR_STR, return NULL);
+
+	handle->spi_num = config->spi_num;
+	handle->spi_pins_pack = config->spi_pins_pack;
+	handle->cap_edge = config->cap_edge;
+	handle->firstbit = config->firstbit;
 	handle->lock = mutex_create();
 
 	return handle;
@@ -51,8 +64,12 @@ stm_err_t shift_register_write_bytes(shift_register_handle_t handle, uint8_t *da
 	SHIFT_REGISTER_CHECK(data, SHIFT_REGISTER_WRITE_ERR_STR, return STM_ERR_INVALID_ARG);
 
 	mutex_lock(handle->lock);
-
-
+	int ret = spi_write_bytes(handle->spi_num, data, length, 100);
+	if(ret) {
+		STM_LOGE(TAG, SHIFT_REGISTER_WRITE_ERR_STR);
+		mutex_unlock(handle->lock);
+		return STM_FAIL;
+	}
 	mutex_unlock(handle->lock);
 
 	return STM_OK;

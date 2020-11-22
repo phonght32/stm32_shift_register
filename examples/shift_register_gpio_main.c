@@ -29,31 +29,32 @@
 #define TASK_SIZE   512
 #define TASK_PRIOR  5
 
+#define SPI_NUM         SPI_NUM_1
+#define SPI_PINS_PACK   SPI_PINS_PACK_2
+#define CAP_EDGE        SPI_CAP_FALLING_EDGE
+#define FIRSTBIT        SPI_TRANS_FIRSTBIT_MSB
+
 static const char *TAG = "APP_MAIN";
 shift_register_handle_t shift_register_handle;
 
 static void example_task(void* arg)
 {
-    shift_register_hw_info_t shift_register_hw_info = {
-        .gpio_port_data = GPIO_PORT_B,
-        .gpio_num_data = GPIO_NUM_5,
-        .gpio_port_clk = GPIO_PORT_B,
-        .gpio_num_clk = GPIO_NUM_3,
-    };
-
     shift_register_cfg_t shift_register_cfg = {
-        .hw_info = shift_register_hw_info,
-        .comm_mode = SHIFT_REGISTER_COMM_MODE_GPIO,
+        .spi_num = SPI_NUM,
+        .spi_pins_pack = SPI_PINS_PACK,
+        .cap_edge = CAP_EDGE,
+        .firstbit = FIRSTBIT
     };
-
     shift_register_handle = shift_register_init(&shift_register_cfg);
 
-    uint8_t data_send[3] = {0xF0, 0x0F, 0xAA};
-    shift_register_write_bytes(shift_register_handle, data_send, 1);
-
-    while(1)
+    while (1)
     {
-        vTaskDelay(1000/portTICK_PERIOD_MS);
+        uint8_t data_send = 0x01;
+        for (uint8_t i = 0; i < 8; i++) {
+            shift_register_write_bytes(shift_register_handle, &data_send, 1);
+            data_send = data_send << 1;
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
     }
 }
 

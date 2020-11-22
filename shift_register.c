@@ -65,7 +65,7 @@ stm_err_t shift_register_write_bytes(shift_register_handle_t handle, uint8_t *da
 
 	mutex_lock(handle->lock);
 	int ret = spi_write_bytes(handle->spi_num, data, length, 100);
-	if(ret) {
+	if (ret) {
 		STM_LOGE(TAG, SHIFT_REGISTER_WRITE_ERR_STR);
 		mutex_unlock(handle->lock);
 		return STM_FAIL;

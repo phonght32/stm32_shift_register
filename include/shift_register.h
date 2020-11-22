@@ -59,6 +59,14 @@ shift_register_handle_t shift_register_init(shift_register_cfg_t *config);
  */
 stm_err_t shift_register_write_bytes(shift_register_handle_t handle, uint8_t *data, uint16_t length);
 
+/* 
+ * @brief	Destroy shift register instance.
+ * @param 	handle Handle structure.
+ * @return	None.
+ */
+void shift_register_destroy(shift_register_handle_t handle);
+
+
 #ifdef __cplusplus
 }
 #endif

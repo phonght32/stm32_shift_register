@@ -74,3 +74,8 @@ stm_err_t shift_register_write_bytes(shift_register_handle_t handle, uint8_t *da
 
 	return STM_OK;
 }
+
+void shift_register_destroy(shift_register_handle_t handle)
+{
+	free(handle);
+}

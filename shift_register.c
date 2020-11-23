@@ -47,7 +47,7 @@ shift_register_handle_t shift_register_init(shift_register_cfg_t *config)
 		.cap_edge = config->cap_edge,
 		.firstbit = config->firstbit
 	};
-	SHIFT_REGISTER_CHECK(!spi_config(&spi_cfg), SHIFT_REGISTER_INIT_ERR_STR, return NULL);
+	SHIFT_REGISTER_CHECK(!spi_config(&spi_cfg), SHIFT_REGISTER_INIT_ERR_STR, {_shift_register_cleanup(handle); return NULL;});
 
 	handle->spi_num = config->spi_num;
 	handle->spi_pins_pack = config->spi_pins_pack;
